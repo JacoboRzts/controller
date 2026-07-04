@@ -73,10 +73,11 @@ class Client:
             print(f"Error: {e}")
             return None
     
-    def getNode(self, dpid):
+    def getNode(self, dpid, nonconfig=True):
+        config = '?content=nonconfig' if nonconfig else ''
         try:
             response = self.requests.get(
-                f"{self._rfc["nodes"]}/node=openflow:{dpid}?content=nonconfig",
+                f"{self._rfc["nodes"]}/node=openflow:{dpid}{config}",
                 auth=self.auth,
                 headers=self.headers
             )
@@ -92,6 +93,34 @@ class Client:
             # id = node["opendaylight-inventory:node"][0]["id"].split(':')[1]
             # print(node["opendaylight-inventory:node"][0]["flow-node-inventory:table"])
 
+
+    def getAllFlows(self, dpid):
+        """Get All the nodes from a Node using only the DPID of the node.
+        """
+        flows_array = []
+        node = self.getNode(dpid, False).get('opendaylight-inventory:node')[0]
+        tables = node.get('flow-node-inventory:table', [])
+        for table in tables:
+            flows = table.get('flow', [])
+            for flow in flows:
+                flows_array.append(flow)
+        return flows_array
+
+    def getAllGroups(self, dpid):
+        groups_array = []
+        node = self.getNode(dpid, False).get('opendaylight-inventory:node')[0]
+        groups = node.get('flow-node-inventory:group', [])
+        for group in groups:
+            groups_array.append(group)
+        return groups_array
+    
+    def getAllMeters(self, dpid):
+        meters_arrays = []
+        node = self.getNode(dpid, False).get('opendaylight-inventory:node')[0]
+        meters = node.get('flow-node-inventory:meter', [])
+        for meter in meters:
+            meters_arrays.append(meter)
+        return meters_arrays
 
     # -----------------------------------------------------------------------------------------------
     # Flows
@@ -134,7 +163,7 @@ class Client:
             auth=self.auth,
             headers=self.headers
         )
-        print(f"[{response.status_code}] DPID:{dpid} FLOW:{id}")
+        return response.status_code
 
     def getFlows(self, dpid, table=None):
         """ Get all the flow from an specific table on an specific node.
