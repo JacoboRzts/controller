@@ -18,5 +18,8 @@ try:
         meters = c.getAllMeters(node)
         print(f"[bold]{node}", end='  ')
         print(f'[blue] {len(flows)} flows [green] {len(groups)} groups [orange] {len(meters)} meters')
+        if args.save:
+            for flow in flows:
+                c.saveFlow(flow, flow['id'], f"flow/{node}")
 except Exception as e:
     print(f"[bold red]Error:[/bold red] {str(e)}")
