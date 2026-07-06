@@ -4,7 +4,6 @@ from rich import print
 
 parser = argparse.ArgumentParser(description='Remove all the flows from the controller')
 parser.add_argument('--host', default='127.0.0.1', required=True, help='ODL host IP address (default is localhost)')
-parser.add_argument('--table', default='0', help='Default table ID (default is 0)')
 parser.add_argument('--verbose', action='store_true', help="show if the flows deleted information and the status code")
 args = parser.parse_args()
 
@@ -19,7 +18,7 @@ def get_status_color(status_code):
     else:
         return "white"
 
-c = Client(ip=args.host, default_table=args.table)
+c = Client(ip=args.host)
 
 try:
     topology = c.getTopology()

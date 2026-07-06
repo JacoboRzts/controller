@@ -288,7 +288,7 @@ class ODLFlowMonitor:
         
         # Add columns
         table.add_column("Node", style="cyan", no_wrap=True)
-        table.add_column("Flow ID", style="green", no_wrap=True)
+        table.add_column("Flow", style="green", no_wrap=True)
         table.add_column("Pri", style="yellow", justify="center")
         table.add_column("Match", style="white")
         table.add_column("Action", style="magenta")

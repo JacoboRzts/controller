@@ -32,3 +32,11 @@ class Action:
           "order": order,
           "dec-mpls-ttl": {}
         }
+
+    def meter(self, meter, order=0):
+        return {
+            "order": order,
+            "meter-action": {
+                "meter-id": meter,
+            },
+        }
