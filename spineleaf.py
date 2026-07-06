@@ -3,7 +3,7 @@ import vars
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--host', default='127.0.0.1', required=True, help='ODL host IP address (default is localhost)')
+parser.add_argument('--host', default='127.0.0.1', help='ODL host IP address (default is localhost)')
 parser.add_argument('--table', type=int, default=0, help='Table ID to monitor (default: 0)')
 parser.add_argument('--save', action='store_true', help="Save the flows into a file.")
 args = parser.parse_args()
@@ -102,3 +102,20 @@ for dpid in leafs:
                 ]
             )
         )
+dpid = nodes[-1]
+host = 4
+c.setFlow(
+    dpid,
+    Flow(
+        f"{names[dpid]}00{host}",
+        f"H{host}",
+        table,
+        100,
+        Match.eth(dst_ip=f"10.0.{int(names[dpid])-2}.{host}/32"),
+        [
+            ins.apply([
+                act.output((host) + 12)
+            ])
+        ]
+    )
+)
