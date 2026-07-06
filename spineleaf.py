@@ -11,6 +11,7 @@ args = parser.parse_args()
 nodes = vars.NODES
 names = vars.NAMES
 table = args.table
+save = args.save
 
 arps = nodes[1:]
 spines = nodes[0:2]
@@ -27,7 +28,7 @@ for dpid in arps:
     c.setFlow(
         dpid,
         Flow(
-            f"{names[dpid]}000",
+            f"{names[dpid]}00",
             "ARP",
             table,
             100,
@@ -35,7 +36,7 @@ for dpid in arps:
             [
                 ins.apply([act.output("NORMAL")])
             ]
-        )
+        ),
     )
 
 # Spine leaf distribution
@@ -54,43 +55,83 @@ for dpid in spines:
                         act.output(str(subnet + 1)),
                     ])
                 ]
-            )
+            ),
+            save
         )
 
 # Leaf distribution
 for dpid in leafs:
     # leaf spine distribution
-    this = int(names[dpid]) - 2
-    ports = [2, 3]
-    subnets = [1, 2, 3]
-    nextport = 0
-    for subnet in subnets:
-        if subnet == this:
-            continue
-        c.setFlow(
-            dpid,
-            Flow(
-                f"{names[dpid]}000{subnet}",
-                f"S{subnet}",
-                table,
-                90,
-                Match.eth(dst_ip=f"10.0.{subnet}.0/24"),
-                [
-                    ins.apply([
-                        act.output(ports[nextport]),
-                    ])
-                ]
-            ),
-            True
-        )
-        nextport += 1
-        nextport %= 2
+    c.setFlow(
+        dpid=dpid,
+        flow=Flow(
+            f"{names[dpid]*3}",
+            "S-balanced",
+            table,
+            90,
+            Match.eth(dst_ip="10.0.0.0/16"),
+            [
+                ins.meter(1),
+                ins.table(101, 1)
+            ]
+        ),
+        
+    )
+    # # Priority path
+    c.setFlow(
+        dpid=dpid,
+        flow=Flow(
+            f"{names[dpid]}01",
+            "S-balanced-path-A",
+            101, # table
+            100, # priority
+            Match.dscp(10),
+            [
+                ins.apply([
+                    act.output(2)
+                ])
+            ]
+        ),
+        
+    )
+    # Seconday path
+    c.setFlow(
+        dpid=dpid,
+        flow=Flow(
+            f"{names[dpid]}02",
+            "S-balanced-path-B",
+            101, # table
+            100, # priority
+            Match.dscp(12),
+            [
+                ins.apply([
+                    act.output(3)
+                ])
+            ]
+        ),
+    )
+        # Seconday path
+    c.setFlow(
+        dpid=dpid,
+        flow=Flow(
+            f"{names[dpid]}03",
+            "S-balanced-path-B-2",
+            101, # table
+            100, # priority
+            Match.eth(dst_ip="10.0.0.0/16"),
+            [
+                ins.apply([
+                    act.output(3)
+                ])
+            ]
+        ),
+    )
     # leaf host distribution
     for host in hosts:
         c.setFlow(
             dpid,
             Flow(
-                f"{names[dpid]}00{host}",
+                f"{names[dpid]}0{host}",
                 f"H{host}",
                 table,
                 100,
@@ -100,5 +141,6 @@ for dpid in leafs:
                         act.output((host) + 12)
                     ])
                 ]
-            )
+            ),
+            save
         )
