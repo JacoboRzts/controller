@@ -4,7 +4,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-c' ,'--controller', default='127.0.0.1', help='ODL Controller IP address (default is localhost)')
-parser.add_argument('-t' ,'--table', type=int, default=0, help='Table to upload flows (default: 0')
+parser.add_argument('-t' ,'--table', type=int, default=0, help='Table to upload flows (default: 100)')
 parser.add_argument('-s' ,'--save', action='store_true', help="Save the flows into a file.")
 args = parser.parse_args()
 

@@ -14,11 +14,9 @@ from rich.console import Console
 from rich.table import Table
 from rich.live import Live
 from rich.panel import Panel
-from rich.layout import Layout
 from rich import box
 from rich.text import Text
 from rich.align import Align
-from rich.control import Control
 
 class ODLFlowMonitor:
     def __init__(self, host, port=8181, user='admin', password='admin', table=0, interval=5):
