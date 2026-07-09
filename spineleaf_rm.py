@@ -4,7 +4,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--host', default='127.0.0.1', help='ODL host IP address (default is localhost)')
-parser.add_argument('--table', type=int, default=0, help='Table ID to monitor (default: 0)')
+parser.add_argument('--table', type=int, default=0, help='Table ID to monitor')
 parser.add_argument('--save', action='store_true', help="Save the flows into a file.")
 args = parser.parse_args()
 
@@ -19,23 +19,23 @@ hosts = [1, 2, 3]
 subnets = hosts
 
 c = Client(ip=args.host, default_table=args.table)
-ins = Instruction()
-act = Action()
 
 # Add all the ARP flows into Switches 2 to 5
 for dpid in arps:
     c.setFlow(
         dpid,
         Flow(
-            f"{names[dpid]}000",
+            f"{names[dpid]}00",
             "ARP",
             table,
             100,
             Match.arp(),
             [
-                ins.apply([act.output("NORMAL")])
+                Instruction.apply([
+                    Action.output("FLOOD")
+                ])
             ]
-        )
+        ),
     )
 
 # Spine leaf distribution
@@ -50,57 +50,47 @@ for dpid in spines:
                 100,
                 Match.eth(dst_ip=f"10.0.{subnet}.0/24"),
                 [
-                    ins.apply([
-                        act.output(str(subnet + 1)),
+                    Instruction.apply([
+                        Action.output(str(subnet + 1)),
                     ])
                 ]
-            )
+            ),
         )
 
 # Leaf distribution
 for dpid in leafs:
     # leaf spine distribution
-    this = int(names[dpid]) - 2
-    ports = [2, 3]
-    subnets = [1, 2, 3]
-    nextport = 0
-    for subnet in subnets:
-        if subnet == this:
-            continue
-        c.setFlow(
-            dpid,
-            Flow(
-                f"{names[dpid]}000{subnet}",
-                f"S{subnet}",
-                table,
-                90,
-                Match.eth(dst_ip=f"10.0.{subnet}.0/24"),
-                [
-                    ins.apply([
-                        act.output(ports[nextport]),
-                    ])
-                ]
-            ),
-            True
-        )
-        nextport += 1
-        nextport %= 2
+    c.setFlow(
+        dpid=dpid,
+        flow=Flow(
+            f"{names[dpid]*3}",
+            "S-balanced",
+            table,
+            90,
+            Match.eth(dst_ip="10.0.0.0/16"),
+            [
+                Instruction.apply([
+                    Action.output(2)
+                ])
+            ]
+        ),
+    )
     # leaf host distribution
     for host in hosts:
         c.setFlow(
             dpid,
             Flow(
-                f"{names[dpid]}00{host}",
+                f"{names[dpid]}0{host}",
                 f"H{host}",
                 table,
                 100,
                 Match.eth(dst_ip=f"10.0.{int(names[dpid])-2}.{host}/32"),
                 [
-                    ins.apply([
-                        act.output((host) + 12)
+                    Instruction.apply([
+                        Action.output((host) + 12)
                     ])
                 ]
-            )
+            ),
         )
 dpid = nodes[-1]
 host = 4

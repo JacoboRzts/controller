@@ -23,3 +23,16 @@ class Match:
                 }
             }
         }
+
+    @staticmethod
+    def dscp(dscp):
+        return {
+            "ethernet-match": {
+                "ethernet-type": {
+                    "type": 2048
+                }
+            },
+            "ip-match": {
+                "ip-dscp": dscp
+            }
+        }
