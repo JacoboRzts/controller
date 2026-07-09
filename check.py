@@ -3,7 +3,7 @@ import argparse
 from rich import print
 
 parser = argparse.ArgumentParser(description='OpenDaylight Flow Monitor with Rich UI')
-parser.add_argument('--host', default='127.0.0.1', required=True, help='ODL host IP address (default is localhost)')
+parser.add_argument('--host', default='127.0.0.1', help='ODL host IP address (default is localhost)')
 parser.add_argument('--save', action='store_true', help="Save the flows into a file.")
 args = parser.parse_args()
 

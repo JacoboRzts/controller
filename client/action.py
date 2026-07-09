@@ -1,5 +1,6 @@
 class Action:
-    def output(self, port, order=0):
+    @staticmethod
+    def output(port, order=0):
         return {
             "order": order,
             "output-action": {
@@ -7,7 +8,8 @@ class Action:
             }
         }
 
-    def group(self, group, order=0):
+    @staticmethod
+    def group(group, order=0):
         return {
             "order": order,
             "group-action": {
@@ -15,25 +17,29 @@ class Action:
             }
         }
 
-    def drop(self, order=0):
+    @staticmethod
+    def drop(order=0):
         return {
             "order": order,
             "drop-action": {}
         }
 
-    def dec_ttl(self, order=0):
+    @staticmethod
+    def dec_ttl(order=0):
         return {
           "order": order,
           "dec-nw-ttl": {}
         }
 
-    def dec_ttl_mpls(self, order=0):
+    @staticmethod
+    def dec_ttl_mpls(order=0):
         return {
           "order": order,
           "dec-mpls-ttl": {}
         }
 
-    def meter(self, meter, order=0):
+    @staticmethod
+    def meter(meter, order=0):
         return {
             "order": order,
             "meter-action": {

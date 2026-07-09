@@ -3,7 +3,7 @@ import argparse
 from rich import print
 
 parser = argparse.ArgumentParser(description='Remove all the flows from the controller')
-parser.add_argument('--host', default='127.0.0.1', required=True, help='ODL host IP address (default is localhost)')
+parser.add_argument('--host', default='127.0.0.1', help='ODL host IP address (default is localhost)')
 parser.add_argument('--verbose', action='store_true', help="show if the flows deleted information and the status code")
 args = parser.parse_args()
 

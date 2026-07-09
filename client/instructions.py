@@ -1,5 +1,6 @@
 class Instruction:
-    def apply(self, actions, order=0):
+    @staticmethod
+    def apply(actions, order=0):
         return {
             "order": order,
             "apply-actions": {
@@ -7,7 +8,8 @@ class Instruction:
             }
         }
 
-    def meter(self, meter_id, order=0):
+    @staticmethod
+    def meter(meter_id, order=0):
         return {
             "order": order,
             "meter": {
@@ -15,7 +17,8 @@ class Instruction:
             }
         }
 
-    def table(self, table_id, order=0):
+    @staticmethod
+    def table(table_id, order=0):
         return {
             "order": order,
             "go-to-table": {
