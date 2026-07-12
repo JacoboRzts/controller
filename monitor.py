@@ -454,18 +454,18 @@ class ODLFlowMonitor:
 
 def main():
     parser = argparse.ArgumentParser(description='OpenDaylight Flow Monitor with Rich UI')
-    parser.add_argument('--host', default="127.0.0.1", help='ODL host IP address')
+    parser.add_argument('-c', '--controller', default="127.0.0.1", help='ODL host IP address')
     parser.add_argument('--port', type=int, default=8181, help='ODL REST port (default: 8181)')
     parser.add_argument('--user', default='admin', help='Username for authentication (default: admin)')
     parser.add_argument('--password', default='admin', help='Password for authentication (default: admin)')
-    parser.add_argument('--table', type=int, default=0, help='Table ID to monitor (default: 0)')
-    parser.add_argument('--interval', type=int, default=5, help='Update interval in seconds (default: 5)')
+    parser.add_argument('-t', '--table', type=int, default=0, help='Table ID to monitor (default: 0)')
+    parser.add_argument('-i', '--interval', type=int, default=5, help='Update interval in seconds (default: 5)')
     
     args = parser.parse_args()
     
     # Create monitor and run
     monitor = ODLFlowMonitor(
-        host=args.host,
+        host=args.controller,
         port=args.port,
         user=args.user,
         password=args.password,
